@@ -48,7 +48,7 @@ namespace Estacionamento_banco_de_dados
             {
                 do
                 {
-                    Console.Write("\nOla mundo teste\nDeseja alterar: " +
+                    Console.Write("\nDeseja alterar: " +
                                   "\n(1). Nome" +
                                   "\n(2). CPF" +
                                   "\n(3). Veiculo" +
