@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Estacionamento_banco_de_dados
 {
@@ -27,8 +28,10 @@ namespace Estacionamento_banco_de_dados
             this.Cor = cor;
         }
         public int Id { get; set; }
-        public string Placa { get; }
-        public string Modelo { get; }
-        public string Cor { get; }
+        public string Placa { get; set; }
+        public string Modelo { get; set; }
+        public string Cor { get; set; }
+        public IList<ClienteVeiculo> Cliente { get; set; }
+
     }
 }

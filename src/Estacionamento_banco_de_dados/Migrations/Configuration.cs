@@ -10,6 +10,7 @@
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            ContextKey = "Estacionamento_banco_de_dados.EstacionamentoContext";
         }
 
         protected override void Seed(Estacionamento_banco_de_dados.EstacionamentoContext context)

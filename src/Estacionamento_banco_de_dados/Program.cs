@@ -35,9 +35,7 @@ namespace Estacionamento_banco_de_dados
                     }
                 }
             } while (opcaoMenu != 0);
-
         }
-
         private static void AlterarDados(EstacionamentoContext contexto)
         {
             Console.Write("Digite o cpf do cliente que deseja alterar: ");
@@ -51,7 +49,7 @@ namespace Estacionamento_banco_de_dados
                     Console.Write("\nDeseja alterar: " +
                                   "\n(1). Nome" +
                                   "\n(2). CPF" +
-                                  "\n(3). Veiculo" +
+                                  "\n(3). Adicionar Veiculo" +
                                   "\n(0). Salvar alterações" +
                                   "\nOpção: ");
                     opcaoMenu = int.Parse(Console.ReadLine());
@@ -68,20 +66,15 @@ namespace Estacionamento_banco_de_dados
                         cliente.CPF = Console.ReadLine();
                         break;
                     case 3:
-                        Console.Write("Digite a nova placa: ");
-                        cliente.PlacaCarro = Console.ReadLine();
+                        var veiculo = CadastrarVeiculo();
+                        cliente.IncluirVeiculo(veiculo);
+                        contexto.SaveChanges();
                         break;
                 }
             } while (opcaoMenu != 0);
             contexto.Clientes.AddOrUpdate(cliente);
             contexto.SaveChanges();
         }
-
-        private static void Entries(IEnumerable<DbEntityEntry> entries)
-        {
-            Console.WriteLine(entries);
-        }
-
         private static void RemoverCliente(EstacionamentoContext contexto)
         {
             Console.Write("Digite o cpf do cliente: ");
@@ -90,7 +83,6 @@ namespace Estacionamento_banco_de_dados
             contexto.Clientes.Remove(clienteRemovido);
             contexto.SaveChanges();
         }
-
         private static void CadastrarCliente(EstacionamentoContext contexto)
         {
 
@@ -98,12 +90,23 @@ namespace Estacionamento_banco_de_dados
             string nome = Console.ReadLine();
             Console.Write("Digite o cpf do cliente: ");
             string cpf = Console.ReadLine();
-            Console.Write("Digite a placa do veiculo do cliente: ");
-            string placa = Console.ReadLine();
-            contexto.Clientes.Add(new Cliente(nome, cpf, placa));
+            var c = new Cliente(nome, cpf);
+            var veiculo = CadastrarVeiculo();
+            c.IncluirVeiculo(veiculo);
+            contexto.Clientes.Add(c);
             contexto.SaveChanges();
         }
+        private static Veiculo CadastrarVeiculo()
+        {
 
+            Console.Write("Digite a placa do veiculo: ");
+            var placa = Console.ReadLine();
+            Console.Write("Digite o modelo do veiculo: ");
+            var modelo = Console.ReadLine();
+            Console.Write("Digite a cor do veiculo: ");
+            var cor = Console.ReadLine();
+            return new Veiculo(placa, modelo, cor);
+        }
         private static void PrintarMenu()
         {
             Console.Write("\nDigite a opção desejada:" +

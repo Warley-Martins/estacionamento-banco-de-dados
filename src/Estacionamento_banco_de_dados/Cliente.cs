@@ -4,13 +4,14 @@ using System.Text;
 
 namespace Estacionamento_banco_de_dados
 {
-    class Cliente
+    public class Cliente
     {
         public Cliente()
         {
-
+            Veiculos = new List<ClienteVeiculo>();
         }
-        public Cliente(string nome, string cpf, params Veiculo[] veiculos)
+        public Cliente(string nome, string cpf)
+            : this()
         {
 
             if (string.IsNullOrEmpty(nome))
@@ -21,14 +22,6 @@ namespace Estacionamento_banco_de_dados
             {
                 throw new ArgumentException("O cpf não pode ser nula ou vazia");
             }
-            if (veiculos == null)
-            {
-                throw new NullReferenceException("Referencia não definida para carros");
-            }
-            foreach (var item in veiculos)
-            {
-                this.Veiculos.Add(item);
-            }
             this.Nome = nome;
             this.CPF = cpf;
         }
@@ -36,8 +29,11 @@ namespace Estacionamento_banco_de_dados
         public int Id { get; set; }
         public string Nome { get; set; }
         public string CPF { get; set; }
-        public int VeiculoId { get; set; }
-        public List<Veiculo> Veiculos { get; set; }
-        
+        public IList<ClienteVeiculo> Veiculos { get; set;}
+ 
+        public void IncluirVeiculo(Veiculo veiculo)
+        {
+            this.Veiculos.Add(new ClienteVeiculo { Veiculo = veiculo});
+        }
     }
 }
