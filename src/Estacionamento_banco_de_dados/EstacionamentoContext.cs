@@ -9,11 +9,16 @@ namespace Estacionamento_banco_de_dados
     {
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Veiculo> Veiculos { get; set; }
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        public DbSet<Registro> Registros {get; set;}
+
+protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder
                 .Entity<ClienteVeiculo>()
                 .HasKey(CV => new { CV.ClienteId, CV.VeiculoId });
+            modelBuilder
+                .Entity<RegistroCliente>()
+                .HasKey(RC => new { RC.ClienteId, RC.RegistroId});
         }
 
     }

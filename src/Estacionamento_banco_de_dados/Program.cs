@@ -6,6 +6,18 @@ namespace Estacionamento_banco_de_dados
     {
         static void Main(string[] args)
         {
+            using (var contexto = new EstacionamentoContext())
+            {
+
+                Cliente c = new Cliente("Warley Martins", "25847539630");
+                Veiculo v = new Veiculo("AGB-0876", "palio", "preto");
+                c.IncluirVeiculo(v);
+                Registro r = new Registro(c);
+                contexto.Registros.Add(r);
+                contexto.SaveChanges();
+                Console.ReadLine();
+
+            }
             int opcaoMenu;
             do
             {
