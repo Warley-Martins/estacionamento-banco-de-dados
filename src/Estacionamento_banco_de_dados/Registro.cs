@@ -8,15 +8,6 @@ namespace Estacionamento_banco_de_dados
     {
         public Registro()
         {
-            //if(cliente == null)
-            //{
-            //    throw new NullReferenceException("Referencia não definida para cliente!");
-            //}
-            //if(cliente.Veiculos == null)
-            //{
-            //    throw new NullReferenceException("O cliente não possui referencia para veiculos!");
-            //}
-
             this.DataInicio = DateTime.Now;
             this.DataFim = DateTime.Now.AddHours(1);
             this.Estado = true;

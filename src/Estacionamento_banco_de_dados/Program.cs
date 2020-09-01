@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Estacionamento_banco_de_dados
 {
@@ -6,7 +7,6 @@ namespace Estacionamento_banco_de_dados
     {
         static void Main(string[] args)
         {
-            
             int opcaoMenu;
             do  //Inicio do loop
             {
@@ -21,7 +21,7 @@ namespace Estacionamento_banco_de_dados
                     {
                         opcaoMenu = int.MaxValue;
                         Console.WriteLine($"Exceção lançada: {e.Message}");
-                    }
+                    } // Atribuicao de int
                 } while (opcaoMenu < 0 || opcaoMenu > 3); // Fim Opcao do menu
                 using (var contexto = new EstacionamentoContext()) //Abertura do banco de dados
                 {
@@ -36,7 +36,7 @@ namespace Estacionamento_banco_de_dados
                         case 3:
                             AlterarDados(contexto); //Altera dados de um cliente
                             break;
-                    }
+                    } // chamada de motodos de funcionalidades
                 }  // Fechamento do banco de dados
             } while (opcaoMenu != 0); //Fim do loop do programa
         }

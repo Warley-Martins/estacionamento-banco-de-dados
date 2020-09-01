@@ -9,9 +9,13 @@ namespace Estacionamento_banco_de_dados
 
         private static void AlterarDados(EstacionamentoContext contexto)
         {
-            Console.Write("Digite o cpf do cliente que deseja alterar: ");
-            string cpf = Console.ReadLine();
-            var cliente = contexto.Clientes.Where(c => c.CPF.Equals(cpf)).FirstOrDefault();
+            string mensagem;
+            Cliente cliente = ProcurarCliente(contexto);
+            if (cliente == null)
+            {
+                Console.WriteLine("\nNão existe cliente cadastrado com o cpf digitado!");
+                return;
+            } // retorna para main
             int opcaoMenu;
             do
             {
@@ -33,16 +37,16 @@ namespace Estacionamento_banco_de_dados
                         Console.WriteLine(e.Message);
                     } // Tentativa de atribuir em int
                 } while (opcaoMenu < 0 || opcaoMenu > 3);
-
                 switch (opcaoMenu)
                 {
                     case 1:
-                        Console.Write("Digite o novo nome: ");
-                        cliente.Nome = Console.ReadLine();
+                        mensagem = "Digite o novo nome: ";
+                        string nome = AtribuirString(mensagem);
+                        cliente.Nome = nome;
                         break;
                     case 2:
-                        Console.Write("Digite o novo cpf: ");
-                        cliente.CPF = Console.ReadLine();
+                        mensagem = "Digite o novo cpf: ";
+                        cliente.CPF = AtribuirString(mensagem);
                         break;
                     case 3:
                         var veiculo = CadastrarVeiculo();
@@ -50,17 +54,26 @@ namespace Estacionamento_banco_de_dados
                         contexto.SaveChanges();
                         break;
                 }
-            } while (opcaoMenu != 0);
+            } while (opcaoMenu != 0); // Alteracao de dados do cliente
             contexto.Clientes.Update(cliente);
             contexto.SaveChanges();
         }
         private static void FinalizarRegistro(EstacionamentoContext contexto)
         {
             var cliente = ProcurarCliente(contexto);
-            var registro = cliente.Registros
-                                            .Where(x => x.Estado == true)
-                                            .FirstOrDefault();
-            Console.WriteLine(cliente.CPF);
+            if (cliente == null)
+            {
+                Console.WriteLine($"\nNão foi encontrado cliente com o cpf digitado!");
+                return;
+            } //retorna para main
+            Registro registro = cliente.Registros
+                                                  .Where(x => x.Estado == true)
+                                                  .FirstOrDefault();
+            if (registro == null)
+            {
+                Console.WriteLine("\nO cliente não possui registros ativos");
+                return;
+            } // retorna para main
             int pagamento;
             do
             {
@@ -69,16 +82,23 @@ namespace Estacionamento_banco_de_dados
                               $"\n(1). Sim" +
                               $"\n(0). Não" +
                               $"\nOpção: ");
-                pagamento = int.Parse(Console.ReadLine());
-            } while (pagamento != 1);
+                try
+                {
+                    pagamento = int.Parse(Console.ReadLine());
+                }
+                catch (Exception e)
+                {
+                    pagamento = int.MaxValue;
+                    Console.WriteLine($"Exceção Lançada: {e.Message}");
+                } // Atribuicao segura de int
+            } while (pagamento != 1); // Enquanto o cliente não pagar
             registro.Estado = false;
             contexto.SaveChanges();
         }
-
         private static Cliente ProcurarCliente(EstacionamentoContext contexto)
         {
-            Console.Write("Digite o cpf do cliente: ");
-            string cpf = Console.ReadLine();
+            var mensagem = "Digite o cpf do cliente: ";
+            string cpf = AtribuirString(mensagem);
             return contexto.Clientes
                                     .Where(x => x.CPF.Equals(cpf))
                                     .Select(x => new Cliente
@@ -98,20 +118,31 @@ namespace Estacionamento_banco_de_dados
                               "\n(1). Sim" +
                               "\n(0). Não" +
                               "\nOpção: ");
-                opcaoMenu = int.Parse(Console.ReadLine());
-            } while (opcaoMenu < 0 || opcaoMenu > 1);
+                try
+                {
+                    opcaoMenu = int.Parse(Console.ReadLine());
+                }
+                catch (Exception e)
+                {
+                    opcaoMenu = int.MaxValue;
+                    Console.WriteLine($"Exceção do tipo: {e.Message}");
+                } // Atribuicao de int seguro
+            } while (opcaoMenu < 0 || opcaoMenu > 1); // Menu de opcoes
             Cliente Cliente;
             switch (opcaoMenu)
             {
-                case 1:
-                    Console.Write("Digite o cpf do cliente: ");
-                    var cpf = Console.ReadLine();
-                    Cliente = contexto.Clientes.Where(c => c.CPF == cpf).FirstOrDefault();
+                case 1: // Inicio de registo para clientes cadastrados
+                    Cliente = ProcurarCliente(contexto);
+                    if (Cliente == null)
+                    {
+                        Console.WriteLine($"\nNão foi encontrado cliente com o cpf digitado!");
+                        return;
+                    } // retorna para main
                     Registro reg = new Registro();
                     Cliente.IncluirRegistro(reg);
                     contexto.SaveChanges();
                     break;
-                case 0:
+                case 0: // Inicio de registro para clientes nao cadastrados
                     Cliente = CadastrarCliente();
                     var veiculo = CadastrarVeiculo();
                     Cliente.IncluirVeiculo(veiculo);
@@ -120,27 +151,26 @@ namespace Estacionamento_banco_de_dados
                     contexto.Clientes.Add(Cliente);
                     contexto.SaveChanges();
                     break;
-            }
+            } // Inicio de registro
         }
 
         private static Cliente CadastrarCliente()
         {
-            Console.Write("Digite o nome do cliente: ");
-            string nome = Console.ReadLine();
-            Console.Write("Digite o cpf do cliente: ");
-            string cpf = Console.ReadLine();
+            var mensagem = "Digite o nome do cliente: ";
+            string nome = AtribuirString(mensagem);
+            mensagem = "Digite o cpf do cliente: ";
+            string cpf = AtribuirString(mensagem);
             return new Cliente(nome, cpf);
         }
 
         private static Veiculo CadastrarVeiculo()
         {
-
-            Console.Write("Digite a placa do veiculo: ");
-            var placa = Console.ReadLine();
-            Console.Write("Digite o modelo do veiculo: ");
-            var modelo = Console.ReadLine();
-            Console.Write("Digite a cor do veiculo: ");
-            var cor = Console.ReadLine();
+            var mensagem = "Digite a placa do veiculo: ";
+            var placa = AtribuirString(mensagem);
+            mensagem = "Digite o modelo do veiculo: ";
+            var modelo = AtribuirString(mensagem);
+            mensagem = "Digite a cor do veiculo: ";
+            var cor = AtribuirString(mensagem);
             return new Veiculo(placa, modelo, cor);
         }
         private static void PrintarMenu()
@@ -151,6 +181,16 @@ namespace Estacionamento_banco_de_dados
                           "\n(3). Alterar dados de um cliente" +
                           "\n(0). Encerrar" +
                           "\nOpção: ");
+        }
+        private static string AtribuirString(string mensagem)
+        {
+            string auxiliar;
+            do
+            {
+                Console.Write(mensagem);
+                auxiliar = Console.ReadLine();
+            } while (String.IsNullOrEmpty(auxiliar) == true);
+            return auxiliar;
         }
     }
 }

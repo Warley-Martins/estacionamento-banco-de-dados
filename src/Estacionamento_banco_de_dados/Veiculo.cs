@@ -7,7 +7,6 @@ namespace Estacionamento_banco_de_dados
     {
         public Veiculo()
         {
-
         }
         public Veiculo(string placa, string modelo, string cor)
         {
@@ -32,6 +31,7 @@ namespace Estacionamento_banco_de_dados
         public string Modelo { get; set; }
         public string Cor { get; set; }
         public IList<ClienteVeiculo> Cliente { get; set; }
+
 
     }
 }
