@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Estacionamento_banco_de_dados
 {
@@ -25,7 +23,15 @@ namespace Estacionamento_banco_de_dados
                                   "\n(3). Adicionar Veiculo" +
                                   "\n(0). Salvar alterações" +
                                   "\nOpção: ");
-                    opcaoMenu = int.Parse(Console.ReadLine());
+                    try
+                    {
+                        opcaoMenu = int.Parse(Console.ReadLine());
+                    }
+                    catch (Exception e)
+                    {
+                        opcaoMenu = int.MaxValue;
+                        Console.WriteLine(e.Message);
+                    } // Tentativa de atribuir em int
                 } while (opcaoMenu < 0 || opcaoMenu > 3);
 
                 switch (opcaoMenu)
@@ -45,30 +51,87 @@ namespace Estacionamento_banco_de_dados
                         break;
                 }
             } while (opcaoMenu != 0);
-            contexto.Clientes.AddOrUpdate(cliente);
+            contexto.Clientes.Update(cliente);
             contexto.SaveChanges();
         }
-        private static void RemoverCliente(EstacionamentoContext contexto)
+        private static void FinalizarRegistro(EstacionamentoContext contexto)
+        {
+            var cliente = ProcurarCliente(contexto);
+            var registro = cliente.Registros
+                                            .Where(x => x.Estado == true)
+                                            .FirstOrDefault();
+            Console.WriteLine(cliente.CPF);
+            int pagamento;
+            do
+            {
+                Console.Write($"\nO valor do estacionamento foi: R${registro.GetValor(DateTime.Now.AddHours(2))}" +
+                              $"\nO cliente pagou?" +
+                              $"\n(1). Sim" +
+                              $"\n(0). Não" +
+                              $"\nOpção: ");
+                pagamento = int.Parse(Console.ReadLine());
+            } while (pagamento != 1);
+            registro.Estado = false;
+            contexto.SaveChanges();
+        }
+
+        private static Cliente ProcurarCliente(EstacionamentoContext contexto)
         {
             Console.Write("Digite o cpf do cliente: ");
             string cpf = Console.ReadLine();
-            var clienteRemovido = contexto.Clientes.Where(x => x.CPF.Equals(cpf)).FirstOrDefault();
-            contexto.Clientes.Remove(clienteRemovido);
-            contexto.SaveChanges();
+            return contexto.Clientes
+                                    .Where(x => x.CPF.Equals(cpf))
+                                    .Select(x => new Cliente
+                                    {
+                                        CPF = x.CPF,
+                                        Nome = x.Nome,
+                                        Registros = x.Registros
+                                    })
+                                    .FirstOrDefault();
         }
-        private static void CadastrarCliente(EstacionamentoContext contexto)
+        private static void IniciarRegistro(EstacionamentoContext contexto)
         {
+            int opcaoMenu;
+            do
+            {
+                Console.Write("\nO cliente ja possui cadastro?" +
+                              "\n(1). Sim" +
+                              "\n(0). Não" +
+                              "\nOpção: ");
+                opcaoMenu = int.Parse(Console.ReadLine());
+            } while (opcaoMenu < 0 || opcaoMenu > 1);
+            Cliente Cliente;
+            switch (opcaoMenu)
+            {
+                case 1:
+                    Console.Write("Digite o cpf do cliente: ");
+                    var cpf = Console.ReadLine();
+                    Cliente = contexto.Clientes.Where(c => c.CPF == cpf).FirstOrDefault();
+                    Registro reg = new Registro();
+                    Cliente.IncluirRegistro(reg);
+                    contexto.SaveChanges();
+                    break;
+                case 0:
+                    Cliente = CadastrarCliente();
+                    var veiculo = CadastrarVeiculo();
+                    Cliente.IncluirVeiculo(veiculo);
+                    var registro = new Registro();
+                    Cliente.IncluirRegistro(registro);
+                    contexto.Clientes.Add(Cliente);
+                    contexto.SaveChanges();
+                    break;
+            }
+        }
 
+        private static Cliente CadastrarCliente()
+        {
             Console.Write("Digite o nome do cliente: ");
             string nome = Console.ReadLine();
             Console.Write("Digite o cpf do cliente: ");
             string cpf = Console.ReadLine();
-            var c = new Cliente(nome, cpf);
-            var veiculo = CadastrarVeiculo();
-            c.IncluirVeiculo(veiculo);
-            contexto.Clientes.Add(c);
-            contexto.SaveChanges();
+            return new Cliente(nome, cpf);
         }
+
         private static Veiculo CadastrarVeiculo()
         {
 
@@ -83,8 +146,8 @@ namespace Estacionamento_banco_de_dados
         private static void PrintarMenu()
         {
             Console.Write("\nDigite a opção desejada:" +
-                          "\n(1). Cadastrar um novo cliente" +
-                          "\n(2). Remover um cliente" +
+                          "\n(1). Iniciar um registro" +
+                          "\n(2). Finalizar um registro" +
                           "\n(3). Alterar dados de um cliente" +
                           "\n(0). Encerrar" +
                           "\nOpção: ");

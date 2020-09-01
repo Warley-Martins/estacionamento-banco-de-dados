@@ -6,42 +6,39 @@ namespace Estacionamento_banco_de_dados
     {
         static void Main(string[] args)
         {
-            using (var contexto = new EstacionamentoContext())
+            
+            int opcaoMenu;
+            do  //Inicio do loop
             {
-
-                Cliente c = new Cliente("Warley Martins", "25847539630");
-                Veiculo v = new Veiculo("AGB-0876", "palio", "preto");
-                c.IncluirVeiculo(v);
-                Registro r = new Registro(c);
-                contexto.Registros.Add(r);
-                contexto.SaveChanges();
-                Console.ReadLine();
-
-            }
-            //int opcaoMenu;
-            //do
-            //{
-            //    do
-            //    {
-            //        PrintarMenu();
-            //        opcaoMenu = int.Parse(Console.ReadLine());
-            //    } while (opcaoMenu < 0 || opcaoMenu > 3);
-            //    using (var contexto = new EstacionamentoContext())
-            //    {
-            //        switch (opcaoMenu)
-            //        {
-            //            case 1:
-            //                CadastrarCliente(contexto);
-            //                break;
-            //            case 2:
-            //                RemoverCliente(contexto); ;
-            //                break;
-            //            case 3:
-            //                AlterarDados(contexto);
-            //                break;
-            //        }
-            //    }
-            //} while (opcaoMenu != 0);
+                do  // Inicio Opcao do menu
+                { 
+                    PrintarMenu();
+                    try
+                    {
+                        opcaoMenu = int.Parse(Console.ReadLine());
+                    }
+                    catch(Exception e)
+                    {
+                        opcaoMenu = int.MaxValue;
+                        Console.WriteLine($"Exceção lançada: {e.Message}");
+                    }
+                } while (opcaoMenu < 0 || opcaoMenu > 3); // Fim Opcao do menu
+                using (var contexto = new EstacionamentoContext()) //Abertura do banco de dados
+                {
+                    switch (opcaoMenu)
+                    {
+                        case 1:
+                            IniciarRegistro(contexto); //Inicia o registro de um cliente
+                            break;
+                        case 2:
+                            FinalizarRegistro(contexto); //Finaliza o registro de um cliente
+                            break;
+                        case 3:
+                            AlterarDados(contexto); //Altera dados de um cliente
+                            break;
+                    }
+                }  // Fechamento do banco de dados
+            } while (opcaoMenu != 0); //Fim do loop do programa
         }
     }
 }

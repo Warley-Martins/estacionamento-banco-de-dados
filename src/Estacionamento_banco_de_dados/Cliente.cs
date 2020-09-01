@@ -8,7 +8,8 @@ namespace Estacionamento_banco_de_dados
     {
         public Cliente()
         {
-            Veiculos = new List<ClienteVeiculo>();
+            this.Veiculos = new List<ClienteVeiculo>();
+            this.Registros = new List<Registro>();
         }
         public Cliente(string nome, string cpf)
             : this()
@@ -29,11 +30,17 @@ namespace Estacionamento_banco_de_dados
         public int Id { get; set; }
         public string Nome { get; set; }
         public string CPF { get; set; }
-        public IList<ClienteVeiculo> Veiculos { get; set;}
- 
+        public IList<ClienteVeiculo> Veiculos { get; set; }
+        public IList<Registro> Registros { get; set; }
+
+        public void IncluirRegistro(Registro registro)
+        {
+            this.Registros.Add(registro);
+        }
+
         public void IncluirVeiculo(Veiculo veiculo)
         {
-            this.Veiculos.Add(new ClienteVeiculo { Veiculo = veiculo});
+            this.Veiculos.Add(new ClienteVeiculo { Veiculo = veiculo });
         }
     }
 }
